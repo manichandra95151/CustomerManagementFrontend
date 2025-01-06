@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* App.css */
+
+/* Global Styles */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #9984F8;
+  margin: 0;
+  padding: 0;
+}
+
+.App {
+  min-height: 100vh;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Custom styles for table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+}
+::-webkit-scrollbar {
+  display: none;
+}
+
+thead {
+  background-color: #4F46E5;
+}
+
+tbody tr:hover {
+  background-color: #F3F4F6;
+}
