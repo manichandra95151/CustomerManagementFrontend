@@ -13,9 +13,8 @@ const CustomerTable = () => {
   const [limit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
+  const [loading, setLoading] = useState(false); // Loading state
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
-// console.log(backendUrl);  
-
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -33,6 +32,7 @@ const CustomerTable = () => {
 
   const fetchCustomers = async () => {
     try {
+      setLoading(true); // Start loading
       const response = await axios.get(`${backendUrl}`, {
         params: { page, limit, search: debouncedSearch, filterField, filterValue },
       });
@@ -41,6 +41,8 @@ const CustomerTable = () => {
       setTotalRecords(response.data.total);
     } catch (error) {
       console.error("Error fetching customers:", error);
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -83,58 +85,61 @@ const CustomerTable = () => {
             <Search className="absolute left-4 top-3.5 text-gray-400 h-5 w-5" />
           </div>
           <div className="flex gap-4 w-full max-w-2xl flex-wrap">
-  <select
-    value={filterField}
-    onChange={handleFilterFieldChange}
-    className="flex-1 bg-gray-50 border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 w-full sm:w-auto"
-  >
-    <option value="">Select Field</option>
-    <option value="email">Email</option>
-    <option value="mobile_number">Mobile Number</option>
-  </select>
-  <input
-    type="text"
-    value={filterValue}
-    onChange={handleFilterValueChange}
-    placeholder="Filter value"
-    className="flex-1 bg-gray-50 border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 w-full sm:w-auto"
-  />
-</div>
-
+            <select
+              value={filterField}
+              onChange={handleFilterFieldChange}
+              className="flex-1 bg-gray-50 border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 w-full sm:w-auto"
+            >
+              <option value="">Select Field</option>
+              <option value="email">Email</option>
+              <option value="mobile_number">Mobile Number</option>
+            </select>
+            <input
+              type="text"
+              value={filterValue}
+              onChange={handleFilterValueChange}
+              placeholder="Filter value"
+              className="flex-1 bg-gray-50 border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 w-full sm:w-auto"
+            />
+          </div>
         </div>
 
         {/* Table Section */}
         <div className="rounded-xl shadow-lg overflow-x-auto">
-          <table className="min-w-full table-auto">
-            <thead className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">S.No</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Mobile</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">DOB</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {customers.length > 0 ? (
-                customers.map((customer, index) => (
-                  <tr key={customer.s_no} className="transition-all duration-300 hover:scale-105 hover:bg-gray-100">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.s_no}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{customer.name_of_customer}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.email}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.mobile_number}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(customer.dob).toLocaleDateString()}</td>
-                  </tr>
-                ))
-              ) : (
+          {loading ? (
+            <div className="text-center py-8 text-gray-500">Loading...</div>
+          ) : (
+            <table className="min-w-full table-auto">
+              <thead className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
                 <tr>
-                  <td colSpan="5" className="px-6 py-4 text-center text-sm text-gray-500">
-                    No customers found.
-                  </td>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">S.No</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Email</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Mobile</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">DOB</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {customers.length > 0 ? (
+                  customers.map((customer, index) => (
+                    <tr key={customer.s_no} className="transition-all duration-300 hover:scale-105 hover:bg-gray-100">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.s_no}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{customer.name_of_customer}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.email}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.mobile_number}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(customer.dob).toLocaleDateString()}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-4 text-center text-sm text-gray-500">
+                      No customers found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
 
         {/* Pagination Section */}
